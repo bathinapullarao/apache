@@ -1,0 +1,53 @@
+Ref: https://qiita.com/yoshidna/items/580126de106c4133368f
+Overview:
+Use https with Apache and mod_ssl
+
+
+environment:
+OS ： CentSO / Redhat 6.x
+httpd / mod_ssl ： 2.2.x
+
+
+Procedure:
+Install Apache and mod_ssl:
+# yum install -y httpd mod_ssl
+# chkconfig httpd on
+
+Browse and make sure the Apache screen is displayed
+
+Place Private Key and Server Certificate (CRT)
+Private Key: server.key
+Server Certificate (CRT): server.crt
+
+# ls /etc/httpd/conf/ssl.key/
+server.key
+# ls /etc/httpd/conf/ssl.crt/
+server.crt
+
+edit ssl.conf
+Modify the private key, the file name of the server certificate, and the location
+
+/etc/httpd/conf.d/ssl.conf
+Assign #SSLCertificateFile to the actual location
+SSLCertificateFile /etc/httpd/conf/ssl.crt/server.crt
+
+Assign #SSLCertificateKeyFile to the actual location
+SSLCertificateKeyFile /etc/httpd/conf/ssl.key/server.key
+
+
+Edit rewrite.conf
+When an http request comes in, redirect to the https request
+/etc/httpd/conf.d/rewrite.conf
+<ifModule mod_rewrite.c>
+      RewriteEngine On
+      RewriteCond% { HTTPS } off
+      RewriteRule ^ ( . * ) $ Https: //% { HTTP_HOST } % { REQUEST_URI }  [ R, L]
+</ifModule>
+
+Apache restart
+# service httpd restart
+Stopping httpd: [OK]
+Starting httpd: [OK]
+
+
+Browse and confirm that the Apache screen is displayed via https communication.
